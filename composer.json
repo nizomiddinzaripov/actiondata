@@ -1,0 +1,27 @@
+{
+    "name": "programm011/actiondata",
+    "description": "ActionData validation",
+    "license": "GPL-3.0-or-later",
+    "type": "library",
+    "version": "1.0.0",
+    "autoload": {
+        "psr-4": {
+            "Programm011\\Actiondata\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "programm011",
+            "email": "programm011@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "illuminate/contracts": "self.version",
+        "illuminate/http": "self.version",
+        "illuminate/support": "self.version",
+        "illuminate/validation": "self.version",
+        "illuminate/container": "self.version"
+    },
+    "minimum-stability": "dev"
+}
