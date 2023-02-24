@@ -29,7 +29,7 @@ class ActionDataBase implements ActionDataContract
      */
     public static function createFromArray(array $parameters = []): self
     {
-        $instance = app()->make(static::class);
+        $instance = new static;
 
         try {
             $class = new \ReflectionClass(static::class);
