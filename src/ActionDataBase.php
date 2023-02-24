@@ -22,6 +22,35 @@ class ActionDataBase implements ActionDataContract
     protected array $rules = [];
 
     /**
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
+
+    /**
+     * Set the container instance.
+     *
+     * @param \Illuminate\Container\Container $container
+     *
+     * @return $this
+     */
+    public function setContainer($container)
+    {
+        $this->container = $container;
+
+        return $this;
+    }
+
+    /**
+     * Get the container instance.
+     *
+     * @return \Illuminate\Container\Container
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
      * @param array $parameters
      *
      * @return static
@@ -30,6 +59,7 @@ class ActionDataBase implements ActionDataContract
     public static function createFromArray(array $parameters = []): self
     {
         $instance = new static;
+        $instance->setContainer(app());
 
         try {
             $class = new \ReflectionClass(static::class);
@@ -111,86 +141,75 @@ class ActionDataBase implements ActionDataContract
     /**
      * @return array
      */
-    protected function getValidationMessages(): array
+    public function getValidationMessages(): array
     {
-        return trans('validation');
+        return [];
     }
 
     /**
      * @return array
      */
-    protected function getValidationAttributes(): array
+    public function getValidationAttributes(): array
     {
-        return trans('validation');
+        return [];
     }
 
     /**
-     * @param bool $trim_nulls
-     *
      * @return array
      */
-    public function toArray(bool $trim_nulls = false): array
+    public function toArray(bool $excludeEmpty = false): array
     {
+        $reflection = new \ReflectionClass($this);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
         $data = [];
 
-        try {
-            $class = new \ReflectionClass(static::class);
+        foreach ($properties as $property) {
+            $name = $property->getName();
+            $value = $this->$name;
 
-            $properties = $class->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-            foreach ($properties as $reflectionProperty) {
-                if ($reflectionProperty->isStatic()) {
-                    continue;
-                }
-
-                $value = $reflectionProperty->getValue($this);
-
-                if ($trim_nulls === true) {
-                    if (!is_null($value)) {
-                        $data[$reflectionProperty->getName()] = $value;
-                    }
-                } else {
-                    $data[$reflectionProperty->getName()] = $value;
-                }
+            if ($excludeEmpty && empty($value)) {
+                continue;
             }
-        } catch (\Exception $exception) {
+
+            $data[$name] = $value;
         }
 
         return $data;
     }
 
     /**
-     * @param bool $trim_nulls
-     *
-     * @return array
+     * @param array $data
      */
-    public function toSnakeArray(bool $trim_nulls = false): array
+    public function fill(array $data)
     {
-        $data = [];
-
-        try {
-            $class = new \ReflectionClass(static::class);
-
-            $properties = $class->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-            foreach ($properties as $reflectionProperty) {
-                if ($reflectionProperty->isStatic()) {
-                    continue;
-                }
-
-                $value = $reflectionProperty->getValue($this);
-
-                if ($trim_nulls === true) {
-                    if (!is_null($value)) {
-                        $data[Str::snake($reflectionProperty->getName())] = $value;
-                    }
-                } else {
-                    $data[Str::snake($reflectionProperty->getName())] = $value;
-                }
+        foreach ($data as $key => $value) {
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
             }
-        } catch (\Exception $exception) {
+        }
+    }
+
+    /**
+     * @param string $key
+     * @return mixed|null
+     */
+    public function __get(string $key)
+    {
+        if (property_exists($this, $key)) {
+            return $this->$key;
         }
 
-        return $data;
+        return null;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     */
+    public function __set(string $key, $value)
+    {
+        if (property_exists($this, $key)) {
+            $this->$key = $value;
+        }
     }
 }
