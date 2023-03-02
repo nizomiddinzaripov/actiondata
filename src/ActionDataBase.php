@@ -282,4 +282,35 @@ class ActionDataBase implements ActionDataContract
     {
         return data_get($this->validator->validated(), $key, $default);
     }
+
+    /**
+     * @param $key
+     *
+     * @return bool
+     */
+    public function has($key): bool
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        $input = $this->toSnakeArray();
+
+        foreach ($keys as $value) {
+            if (!Arr::has($input, $value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed|null $default
+     *
+     * @return mixed
+     */
+    public function get(string $key, mixed $default = null): mixed
+    {
+        return $this->toSnakeArray()[$key] ?? $default;
+    }
 }
