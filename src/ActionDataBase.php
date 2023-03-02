@@ -2,7 +2,9 @@
 
 namespace Programm011\Actiondata;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Http\Concerns\InteractsWithInput;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
@@ -11,6 +13,8 @@ use Illuminate\Validation\ValidationException;
 
 class ActionDataBase implements ActionDataContract
 {
+    use InteractsWithInput;
+
     /**
      * @var \Illuminate\Contracts\Validation\Validator
      */
@@ -22,18 +26,18 @@ class ActionDataBase implements ActionDataContract
     protected array $rules = [];
 
     /**
-     * @var \Illuminate\Container\Container
+     * @var Container
      */
-    protected $container;
+    protected Container $container;
 
     /**
      * Set the container instance.
      *
-     * @param \Illuminate\Container\Container $container
+     * @param Container $container
      *
      * @return $this
      */
-    public function setContainer($container)
+    public function setContainer($container): static
     {
         $this->container = $container;
 
@@ -43,9 +47,9 @@ class ActionDataBase implements ActionDataContract
     /**
      * Get the container instance.
      *
-     * @return \Illuminate\Container\Container
+     * @return Container
      */
-    public function getContainer()
+    public function getContainer(): Container
     {
         return $this->container;
     }
@@ -54,7 +58,6 @@ class ActionDataBase implements ActionDataContract
      * @param array $parameters
      *
      * @return static
-     * @throws BindingResolutionException
      */
     public static function createFromArray(array $parameters = []): self
     {
@@ -161,10 +164,10 @@ class ActionDataBase implements ActionDataContract
     {
         $reflection = new \ReflectionClass($this);
         $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-        $data = [];
+        $data       = [];
 
         foreach ($properties as $property) {
-            $name = $property->getName();
+            $name  = $property->getName();
             $value = $this->$name;
 
             if ($excludeEmpty && empty($value)) {
@@ -191,6 +194,7 @@ class ActionDataBase implements ActionDataContract
 
     /**
      * @param string $key
+     *
      * @return mixed|null
      */
     public function __get(string $key)
@@ -215,6 +219,7 @@ class ActionDataBase implements ActionDataContract
 
     /**
      * @param bool $trim_nulls
+     *
      * @return array
      */
     public function toSnakeArray(bool $trim_nulls = false): array
@@ -227,7 +232,6 @@ class ActionDataBase implements ActionDataContract
             $properties = $class->getProperties(\ReflectionProperty::IS_PUBLIC);
 
             foreach ($properties as $reflectionProperty) {
-
                 if ($reflectionProperty->isStatic()) {
                     continue;
                 }
@@ -241,10 +245,8 @@ class ActionDataBase implements ActionDataContract
                 } else {
                     $data[Str::snake($reflectionProperty->getName())] = $value;
                 }
-
             }
         } catch (\Exception $exception) {
-
         }
 
         return $data;
