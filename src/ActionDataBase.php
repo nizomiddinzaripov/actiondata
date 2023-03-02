@@ -274,4 +274,12 @@ class ActionDataBase implements ActionDataContract
 
         return $results;
     }
+
+    /**
+     * @throws ValidationException
+     */
+    public function validated($key = null, $default = null)
+    {
+        return data_get($this->validator->validated(), $key, $default);
+    }
 }
