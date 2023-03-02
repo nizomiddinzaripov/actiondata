@@ -105,7 +105,7 @@ class ActionDataBase implements ActionDataContract
     public static function createFromRequest(Request $request): self
     {
         $res = static::createFromArray($request->all());
-        $res->validate(false);
+        $res->validate();
 
         return $res;
     }
