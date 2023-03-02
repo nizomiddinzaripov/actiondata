@@ -4,17 +4,16 @@ namespace Programm011\Actiondata;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Http\Concerns\InteractsWithInput;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use stdClass;
 
 class ActionDataBase implements ActionDataContract
 {
-    use InteractsWithInput;
-
     /**
      * @var \Illuminate\Contracts\Validation\Validator
      */
@@ -37,7 +36,7 @@ class ActionDataBase implements ActionDataContract
      *
      * @return $this
      */
-    public function setContainer($container): static
+    public function setContainer(Container $container): static
     {
         $this->container = $container;
 
@@ -250,5 +249,29 @@ class ActionDataBase implements ActionDataContract
         }
 
         return $data;
+    }
+
+    /**
+     * @param $keys
+     *
+     * @return array
+     */
+    public function only($keys): array
+    {
+        $results = [];
+
+        $input = $this->toSnakeArray();
+
+        $placeholder = new stdClass;
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            $value = data_get($input, $key, $placeholder);
+
+            if ($value !== $placeholder) {
+                Arr::set($results, $key, $value);
+            }
+        }
+
+        return $results;
     }
 }

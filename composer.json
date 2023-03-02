@@ -2,7 +2,7 @@
     "name": "programm011/actiondata",
     "description": "ActionData validation",
     "license": "MIT",
-    "version": "1.0.9",
+    "version": "1.0.91",
     "type": "library",
     "autoload": {
         "psr-4": {
