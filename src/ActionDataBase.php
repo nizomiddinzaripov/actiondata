@@ -9,7 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
+use Nette\Schema\ValidationException;
 use stdClass;
 
 class ActionDataBase implements ActionDataContract
@@ -57,6 +57,7 @@ class ActionDataBase implements ActionDataContract
      * @param array $parameters
      *
      * @return static
+     * @throws \Exception
      */
     public static function createFromArray(array $parameters = []): self
     {
@@ -86,6 +87,7 @@ class ActionDataBase implements ActionDataContract
                 unset($parameters[$field]);
             }
         } catch (\Exception $exception) {
+            throw new \Exception($exception->getMessage());
         }
 
         $instance->prepare();
@@ -101,13 +103,16 @@ class ActionDataBase implements ActionDataContract
      * @return static
      * @throws ValidationException
      * @throws BindingResolutionException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public static function createFromRequest(Request $request): self
     {
-        $res = static::createFromArray($request->all());
-        $res->validate();
+        $action = static::createFromArray($request->all());
+        if (!$action->validate()) {
+            throw new ValidationException($action->getValidationErrors());
+        }
 
-        return $res;
+        return $action;
     }
 
     public function addValidationRule($name, $value)
@@ -119,7 +124,7 @@ class ActionDataBase implements ActionDataContract
      * @param bool $silent
      *
      * @return bool
-     * @throws ValidationException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function validate(bool $silent = true): bool
     {
@@ -220,6 +225,7 @@ class ActionDataBase implements ActionDataContract
      * @param bool $trim_nulls
      *
      * @return array
+     * @throws \Exception
      */
     public function toSnakeArray(bool $trim_nulls = false): array
     {
@@ -246,6 +252,7 @@ class ActionDataBase implements ActionDataContract
                 }
             }
         } catch (\Exception $exception) {
+            throw new \Exception($exception->getMessage());
         }
 
         return $data;
@@ -255,6 +262,7 @@ class ActionDataBase implements ActionDataContract
      * @param $keys
      *
      * @return array
+     * @throws \Exception
      */
     public function only($keys): array
     {
@@ -276,7 +284,7 @@ class ActionDataBase implements ActionDataContract
     }
 
     /**
-     * @throws ValidationException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function validated($key = null, $default = null)
     {
@@ -287,6 +295,7 @@ class ActionDataBase implements ActionDataContract
      * @param $key
      *
      * @return bool
+     * @throws \Exception
      */
     public function has($key): bool
     {
@@ -308,6 +317,7 @@ class ActionDataBase implements ActionDataContract
      * @param mixed|null $default
      *
      * @return mixed
+     * @throws \Exception
      */
     public function get(string $key, mixed $default = null): mixed
     {
