@@ -129,8 +129,8 @@ class ActionDataBase implements ActionDataContract
     public function validate(bool $silent = true): bool
     {
         $this->validator = Validator::make($this->toArray(true), $this->rules, $this->getValidationMessages(), $this->getValidationAttributes());
-        if ($silent) {
-            return !$this->validator->fails();
+        if ($silent && $this->validator->fails()) {
+            throw new \Illuminate\Validation\ValidationException($this->validator);
         }
         $this->validator->validate();
 
