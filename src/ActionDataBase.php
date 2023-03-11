@@ -3,13 +3,12 @@
 namespace Programm011\Actiondata;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
-use Nette\Schema\ValidationException;
+use Illuminate\Validation\ValidationException;
 use stdClass;
 
 class ActionDataBase implements ActionDataContract
@@ -102,15 +101,12 @@ class ActionDataBase implements ActionDataContract
      *
      * @return static
      * @throws ValidationException
-     * @throws BindingResolutionException
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Exception
      */
     public static function createFromRequest(Request $request): self
     {
         $action = static::createFromArray($request->all());
-        if (!$action->validate()) {
-            throw new ValidationException($action->getValidationErrors());
-        }
+        $action->validate();
 
         return $action;
     }
@@ -124,13 +120,13 @@ class ActionDataBase implements ActionDataContract
      * @param bool $silent
      *
      * @return bool
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function validate(bool $silent = true): bool
     {
         $this->validator = Validator::make($this->toArray(true), $this->rules, $this->getValidationMessages(), $this->getValidationAttributes());
         if ($silent && $this->validator->fails()) {
-            throw new \Illuminate\Validation\ValidationException($this->validator);
+            throw new ValidationException($this->validator);
         }
         $this->validator->validate();
 
@@ -284,7 +280,7 @@ class ActionDataBase implements ActionDataContract
     }
 
     /**
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function validated($key = null, $default = null)
     {
