@@ -129,8 +129,7 @@ abstract class ActionDataBase implements ActionDataContract
      */
     public function validate(bool $silent = true): bool
     {
-        $this->rules     = array_merge($this->rules, $this->rules());
-        $this->validator = Validator::make($this->toArray(true), $this->rules, $this->getValidationMessages(), $this->getValidationAttributes());
+        $this->validator = Validator::make($this->toArray(true), $this->getRules(), $this->getValidationMessages(), $this->getValidationAttributes());
         if ($silent && $this->validator->fails()) {
             throw new ValidationException($this->validator);
         }
@@ -153,6 +152,14 @@ abstract class ActionDataBase implements ActionDataContract
     public function getValidationMessages(): array
     {
         return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRules(): array
+    {
+        return array_merge($this->rules(), $this->rules);
     }
 
     /**
