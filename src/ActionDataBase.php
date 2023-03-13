@@ -21,7 +21,7 @@ abstract class ActionDataBase implements ActionDataContract
     /**
      * @return array
      */
-    abstract protected function rules(): array;
+    abstract public function rules(): array;
 
     /**
      * @var Container
