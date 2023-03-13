@@ -19,6 +19,11 @@ abstract class ActionDataBase implements ActionDataContract
     private \Illuminate\Contracts\Validation\Validator $validator;
 
     /**
+     * @var array
+     */
+    protected array $rules = [];
+
+    /**
      * @return array
      */
     abstract public function rules(): array;
@@ -113,7 +118,7 @@ abstract class ActionDataBase implements ActionDataContract
 
     public function addValidationRule($name, $value)
     {
-        $this->rules()[$name] = $value;
+        $this->rules[$name] = $value;
     }
 
     /**
@@ -124,7 +129,8 @@ abstract class ActionDataBase implements ActionDataContract
      */
     public function validate(bool $silent = true): bool
     {
-        $this->validator = Validator::make($this->toArray(true), $this->rules(), $this->getValidationMessages(), $this->getValidationAttributes());
+        $this->rules     = array_merge($this->rules, $this->rules());
+        $this->validator = Validator::make($this->toArray(true), $this->rules, $this->getValidationMessages(), $this->getValidationAttributes());
         if ($silent && $this->validator->fails()) {
             throw new ValidationException($this->validator);
         }
