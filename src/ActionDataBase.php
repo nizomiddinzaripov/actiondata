@@ -2,6 +2,7 @@
 
 namespace Programm011\Actiondata;
 
+use stdClass;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -9,7 +10,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use stdClass;
 
 abstract class ActionDataBase implements ActionDataContract
 {
@@ -27,6 +27,27 @@ abstract class ActionDataBase implements ActionDataContract
      * @return array
      */
     abstract public function rules(): array;
+
+    /**
+     * @var array
+     */
+    protected array $attributes = [];
+
+    /**
+     * @return array
+     */
+    public function attributes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
 
     /**
      * @var Container
@@ -90,6 +111,12 @@ abstract class ActionDataBase implements ActionDataContract
 
                 unset($parameters[$field]);
             }
+
+            foreach ($instance->attributes() as $attribute => $validation) {
+                if (isset($parameters[$attribute])) {
+                    $instance->attributes[$attribute] = $parameters[$attribute];
+                }
+            }
         } catch (\Exception $exception) {
             throw new \Exception($exception->getMessage());
         }
@@ -116,7 +143,13 @@ abstract class ActionDataBase implements ActionDataContract
         return $action;
     }
 
-    public function addValidationRule($name, $value)
+    /**
+     * @param $name
+     * @param $value
+     *
+     * @return void
+     */
+    public function addValidationRule($name, $value): void
     {
         $this->rules[$name] = $value;
     }
@@ -159,7 +192,7 @@ abstract class ActionDataBase implements ActionDataContract
      */
     public function getRules(): array
     {
-        return array_merge($this->rules(), $this->rules);
+        return array_merge($this->attributes(), $this->rules(), $this->rules);
     }
 
     /**
@@ -190,7 +223,7 @@ abstract class ActionDataBase implements ActionDataContract
             $data[$name] = $value;
         }
 
-        return $data;
+        return array_merge($this->attributes, $data);
     }
 
     /**
