@@ -184,7 +184,7 @@ abstract class ActionDataBase implements ActionDataContract
      */
     public function getValidationMessages(): array
     {
-        return [];
+        return trans('validation');
     }
 
     /**
