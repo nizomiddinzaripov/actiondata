@@ -11,7 +11,7 @@ class ActionDataServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->beforeResolving(ActionDataBase::class, function ($className) {
+        $this->app->beforeResolving(ActionData::class, function ($className) {
             $this->app->bind($className, function () use ($className) {
                 return $className::createFromRequest($this->app['request']);
             });
