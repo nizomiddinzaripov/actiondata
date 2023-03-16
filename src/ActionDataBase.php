@@ -11,7 +11,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-abstract class ActionDataBase implements ActionDataContract
+abstract class ActionData implements ActionDataContract
 {
     /**
      * @var \Illuminate\Contracts\Validation\Validator
