@@ -333,9 +333,15 @@ abstract class ActionData implements ActionDataContract
     /**
      * @throws ValidationException
      */
-    public function validated($key = null, $default = null)
+    public function validated($key = null, $default = null): array
     {
-        return data_get($this->validator->validated(), $key, $default);
+        $data = [];
+
+        foreach ($this->validator->validated() as $key => $value) {
+            $data[Str::snake($key)] = $value;
+        }
+
+        return $data;
     }
 
     /**
