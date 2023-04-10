@@ -310,7 +310,7 @@ abstract class ActionData implements ActionDataContract
     {
         $results = [];
 
-        $input = $this->toSnakeArray();
+        $input = $this->validated();
 
         $placeholder = new stdClass;
 
@@ -354,7 +354,7 @@ abstract class ActionData implements ActionDataContract
     {
         $keys = is_array($key) ? $key : func_get_args();
 
-        $input = $this->toSnakeArray();
+        $input = $this->validated();
 
         foreach ($keys as $value) {
             if (Arr::has($input, $value) && Arr::get($input, $value) == null) {
