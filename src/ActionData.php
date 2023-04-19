@@ -376,4 +376,9 @@ abstract class ActionData implements ActionDataContract
     {
         return $this->toSnakeArray()[$key] ?? $default;
     }
+
+    public function upload(string $key, string $path = '', string $disk = 'public')
+    {
+        return $this->get($key)->store($path, $disk);
+    }
 }
