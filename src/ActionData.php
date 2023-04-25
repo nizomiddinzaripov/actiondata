@@ -357,7 +357,7 @@ abstract class ActionData implements ActionDataContract
         $input = $this->validated();
 
         foreach ($keys as $value) {
-            if (Arr::has($input, $value) || Arr::get($input, $value) == null) {
+            if (!Arr::has($input, $value) || Arr::get($input, $value) == null) {
                 return false;
             }
         }
